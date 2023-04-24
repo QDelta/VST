@@ -625,14 +625,22 @@ Proof.
       rewrite emp_sepcon in J. simpl in J. apply J.
 Qed. 
 
+Definition gvar_injection (grho: genviron): Prop :=
+  forall id1 id2 b,
+    Map.get grho id1 = Some b ->
+    Map.get grho id2 = Some b ->
+    id1 = id2.
+
 Definition funspecs_assert (FunSpecs: PTree.t funspec): assert :=
- fun rho =>
-   (ALL  id: ident, ALL fs:funspec,  !! (FunSpecs!id = Some fs) -->
-              EX b:block,
-                   !! (Map.get (ge_of rho) id = Some b) && func_at fs (b,0))
- &&  (ALL  b: block, ALL fsig:funsig, ALL cc: calling_convention, sigcc_at fsig cc (b,0) -->
-             EX id:ident, !! (Map.get (ge_of rho) id = Some b)
-                             && !! exists fs, FunSpecs!id = Some fs).
+  fun rho =>
+    !! (gvar_injection (ge_of rho)) &&
+    (ALL id fs,
+      !! (FunSpecs ! id = Some fs) -->
+      EX b, !! (Map.get (ge_of rho) id = Some b) && func_at fs (b, 0)) &&
+    (ALL b fsig cc,
+      sigcc_at fsig cc (b, 0) -->
+      EX id, !! (Map.get (ge_of rho) id = Some b) &&
+             !! (exists fs, FunSpecs!id = Some fs)).
 
 Definition globals_only (rho: environ) : environ := (mkEnviron (ge_of rho) (Map.empty _) (Map.empty _)).
 
@@ -651,7 +659,8 @@ Proof.
 assert (forall FS FS' rho,
              (forall id, FS ! id = FS' ! id) ->
              funspecs_assert FS rho |-- funspecs_assert FS' rho).
-{ intros. intros w [? ?]. split.
+{ intros. intros w [[H' ?] ?]. split; [split |].
+  + assumption.
   + intro id. rewrite <- (H id); auto.
   + intros loc sig cc w' Hw' HH. hnf in H0. destruct (H1 loc sig cc w' Hw' HH)  as [id ID].
     exists id; rewrite <- (H id); auto. }

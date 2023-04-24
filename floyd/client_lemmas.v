@@ -40,7 +40,9 @@ Arguments sem_cmp c !t1 !t2 / v1 v2.
 
 (* The following line should not be needed, and was not needed
  in Coq 8.3, but in Coq 8.4 it seems to be necessary. *)
-Hint Resolve (@LiftClassicalSep environ) : typeclass_instances.
+Definition ListClassicalSep_environ := @LiftClassicalSep environ.
+
+Hint Resolve ListClassicalSep_environ : typeclass_instances.
 
 Definition func_ptr' f v := func_ptr f v && emp.
 
@@ -942,8 +944,8 @@ Lemma sepcon_later_derives {A} {NA: NatDed A}{SL: SepLog A}{IA: Indir A}{SI: Sep
 Proof.
 intros. rewrite later_sepcon. apply sepcon_derives; auto. Qed.
 
-Hint Resolve @andp_later_derives @sepcon_later_derives @sepcon_derives
-              @andp_derives @imp_derives @now_later @derives_refl: derives.
+Hint Resolve andp_later_derives sepcon_later_derives sepcon_derives
+              andp_derives imp_derives now_later derives_refl: derives.
 
 Notation "'DECLARE' x s" := (x: ident, s: funspec)
    (at level 160, x at level 0, s at level 150, only parsing).

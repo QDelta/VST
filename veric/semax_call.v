@@ -352,8 +352,9 @@ Lemma resource_decay_funassert:
 Proof.
 unfold resource_decay, funassert; intros until w'; intro CORE; intros.
 destruct H. 
-destruct H0.
-split; [clear H2 | clear H0].
+destruct H0 as [[H' ?] ?].
+split; [clear H2; split | clear H0].
++ assumption.
 + intros id fs w2 Hw2 H3.
   specialize (H0 id fs). cbv beta in H0.
   specialize (H0 _ (necR_refl _) H3).
@@ -1273,7 +1274,8 @@ assert (forall Delta Delta' rho rho',
              funassert Delta rho |-- funassert Delta' rho').
 + intros.
   unfold funassert.
-  intros w [? ?]; split.
+  intros w [[H' ?] ?]; split; [split |].
+  - rewrite <- H0. assumption.
   - clear H2; intro id. rewrite <- (H id), <- H0; auto.
   - intros loc sig cc w' Hw' H4; destruct (H2 loc sig cc w' Hw' H4)  as [id H3].
     exists id; rewrite <- (H id), <- H0; auto.
@@ -1653,8 +1655,11 @@ auto.
 assert (H4': (funassert Delta (construct_rho (filter_genv psi) vx tx)) (m_phi m')).
 { clear - H6 H4.
   destruct H6 as (?&?&?).
-  destruct H4.
-  split.
+  destruct H4 as [[H' ?] ?].
+  split; [split |].
+  * intros id1 id2 b.
+    specialize (H' id1 id2 b).
+    assumption.
   * intros id fs ???.
     specialize (H2 id fs (m_phi jm) (necR_refl _)).    spec H2; auto.
     destruct H2 as [b [? ?]].
@@ -2935,7 +2940,7 @@ spec H19; [clear H19|]. {
  -
   rewrite (age_jm_dry H20x) in H15.
   clear - H0 TC3 TC8 H18 H16 H21 H15 H23 H17 H17' H13.
-  unfold rho3 in *. simpl in *. destruct H23.
+  unfold rho3 in *. simpl in *. destruct H23 as [[_ ?] ?].
   destruct rho. inv H0. simpl in *.
   remember (split (fn_params f)). destruct p.
   simpl in *. if_tac in H16; try congruence.
@@ -3145,7 +3150,7 @@ assert (MYPROP: exists id fs, Map.get (ge_of rho) id = Some b /\
   destruct XX as [id [Hb [fs specID]]]; simpl in Hb.
 
   assert (exists v, Map.get (ge_of rho) id = Some v /\ func_at fs (v, 0) w).
-  { destruct funassertDelta' as [funassertDeltaA _].
+  { destruct funassertDelta' as [[_ funassertDeltaA] _].
     destruct (funassertDeltaA id fs _ (necR_refl _) specID) as [v [Hv funcatv]]; simpl in Hv.
     exists v; split; trivial. }
   destruct H as [v [Hv funcatv]].
@@ -3357,7 +3362,7 @@ assert (MYPROP: exists id fs, Map.get (ge_of rho) id = Some b /\
   destruct XX as [id [Hb [fs specID]]]; simpl in Hb.
 
   assert (exists v, Map.get (ge_of rho) id = Some v /\ func_at fs (v, 0) w).
-  { destruct funassertDelta' as [funassertDeltaA _].
+  { destruct funassertDelta' as [[_ funassertDeltaA] _].
     destruct (funassertDeltaA id fs _ (necR_refl _) specID) as [v [Hv funcatv]]; simpl in Hv.
     exists v; split; trivial. }
   destruct H as [v [Hv funcatv]].
@@ -3587,7 +3592,7 @@ assert (MYPROP: exists id fs, Map.get (ge_of rho) id = Some b /\
   destruct XX as [id [Hb [fs specID]]]; simpl in Hb.
 
   assert (exists v, Map.get (ge_of rho) id = Some v /\ func_at fs (v, 0) w).
-  { destruct funassertDelta' as [funassertDeltaA _].
+  { destruct funassertDelta' as [[_ funassertDeltaA] _].
     destruct (funassertDeltaA id fs _ (necR_refl _) specID) as [v [Hv funcatv]]; simpl in Hv.
     exists v; split; trivial. }
   destruct H as [v [Hv funcatv]].

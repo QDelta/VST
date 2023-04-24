@@ -662,14 +662,18 @@ Lemma approx_func_ptr: forall (A: Type) fsig0 cc (P Q: A -> environ -> mpred) (v
 Proof. exact seplog.approx_func_ptr_si. Qed.
 
 Definition allp_fun_id (Delta : tycontext) (rho : environ): mpred :=
-ALL id : ident, ALL fs : funspec ,
-  !! ((glob_specs Delta) ! id = Some fs) -->
-  (EX b : block, !! (Map.get (ge_of rho) id = Some b) && func_ptr fs (Vptr b Ptrofs.zero)).
+  !! (gvar_injection (ge_of rho)) &&
+  ALL id : ident, ALL fs : funspec ,
+    !! ((glob_specs Delta) ! id = Some fs) -->
+    (EX b : block,
+      !! (Map.get (ge_of rho) id = Some b) &&
+      func_ptr fs (Vptr b Ptrofs.zero)).
 
 Lemma corable_allp_fun_id: forall Delta rho,
   corable (allp_fun_id Delta rho).
 Proof.
   intros.
+  apply corable_andp; [apply corable_prop |].
   apply corable_allp; intros id.
   apply corable_allp; intros fs.
   apply corable_imp; [apply corable_prop |].

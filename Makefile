@@ -115,7 +115,7 @@ DEPFLAGS:=$(COQFLAGS)
 # DO NOT DISABLE coqc WARNINGS!  That would hinder the Coq team's continuous integration.
 COQC=$(COQBIN)coqc
 COQTOP=$(COQBIN)coqtop
-COQDEP=$(COQBIN)coqdep
+COQDEP=$(COQBIN)coqdep -vos
 COQDOC=$(COQBIN)coqdoc -d doc/html -g  $(DEPFLAGS)
 
 MSL_FILES = \
@@ -438,7 +438,7 @@ else
 endif
 
 # you can also write, COQVERSION= 8.6 or-else 8.6pl2 or-else 8.6pl3   (etc.)
-COQVERSION= 8.10.1 or-else 8.10.0 or-else 8.10+alpha
+COQVERSION= 8.11.0 or-else 8.11.1 or-else 8.11.2 or-else 8.12.0 or-else 8.12.1 or-else 8.12.2
 
 COQV=$(shell $(COQC) -v)
 ifeq ($(IGNORECOQVERSION),true)
@@ -597,10 +597,10 @@ ifneq ($(wildcard paco/src),)
 endif
 
 clean:
-	rm -f $(addprefix veric/version., v vo glob) .lia.cache .nia.cache floyd/floyd.coq .depend _CoqProject _CoqProject-export $(wildcard */.*.aux)  $(wildcard */*.glob) $(wildcard */*.vo) compcert/*/*.vo compcert/*/*/*.vo  compcert_new/*/*.vo compcert_new/*/*/*.vo
-	rm -f coq-ext-lib/theories/*.{vo,glob} InteractionTrees/theories/*.{vo,glob}
-	rm -f paco/src/*.{vo,glob}
-	rm -f fcf/src/FCF/*.{vo,glob}
+	rm -f $(addprefix veric/version., v vo vos vok glob) .lia.cache .nia.cache floyd/floyd.coq .depend _CoqProject _CoqProject-export $(wildcard */.*.aux)  $(wildcard */*.glob) $(wildcard */*.vo */*.vos */*.vok) compcert/*/*.{vo,vos,vok} compcert/*/*/*.{vo,vos,vok} compcert_new/*/*.{vo,vos,vok} compcert_new/*/*/*.{vo,vos,vok}
+	rm -f coq-ext-lib/theories/*.{vo,vos,vok,glob} InteractionTrees/theories/*.{vo,vos,vok,glob}
+	rm -f paco/src/*.{vo,vos,vok,glob}
+	rm -f fcf/src/FCF/*.{vo,vos,vok,glob}
 	rm -fr doc/html
 
 clean-concur:

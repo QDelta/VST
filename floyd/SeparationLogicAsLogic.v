@@ -2891,6 +2891,7 @@ Proof.
   rewrite imp_andp_adjoint.
   rewrite imp_andp_adjoint.
   intros rho.
+  apply derives_extract_prop. intros Hinj.
   apply (allp_left _ id).
   apply (allp_left _ f).
   rewrite prop_imp by auto.

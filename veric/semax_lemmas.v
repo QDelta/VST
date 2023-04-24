@@ -174,7 +174,8 @@ Lemma funassert_resource: forall Delta rho a a' (Hl: level a = level a')
   funassert Delta rho a -> funassert Delta rho a'.
 Proof.
   intros.
-  destruct H as [H1 H2]; split; repeat intro. (*rename H into H1; repeat intro.*)
+  destruct H as [[H' H1] H2]; (split; [split |]); repeat intro.
+  - specialize (H' id1 id2 b). auto.
   - destruct (H1 _ _ _ (rt_refl _ _ _) H0) as (b1 & ? & ?).
     exists b1; split; auto.
     destruct b0; simpl in *.

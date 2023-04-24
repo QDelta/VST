@@ -18,9 +18,10 @@ Qed.
 Hint Resolve corable_funassert : core.
 
 Definition allp_fun_id (Delta : tycontext) (rho : environ): pred rmap :=
- ALL id : ident , ALL fs : funspec ,
-  !! ((glob_specs Delta) ! id = Some fs) -->
-  (EX b : block, !! (Map.get (ge_of rho) id = Some b) && func_ptr_si fs (Vptr b Ptrofs.zero)).
+  !! (gvar_injection (ge_of rho)) &&
+  ALL id : ident , ALL fs : funspec ,
+    !! ((glob_specs Delta) ! id = Some fs) -->
+    (EX b : block, !! (Map.get (ge_of rho) id = Some b) && func_ptr_si fs (Vptr b Ptrofs.zero)).
 
 Definition allp_fun_id_sigcc (Delta : tycontext) (rho : environ): pred rmap :=
 (ALL id : ident ,
@@ -34,6 +35,7 @@ Definition allp_fun_id_sigcc (Delta : tycontext) (rho : environ): pred rmap :=
 Lemma allp_fun_id_ex_implies_allp_fun_sigcc Delta rho: 
   allp_fun_id Delta rho |--  allp_fun_id_sigcc Delta rho.
 Proof.
+  unfold allp_fun_id. apply prop_andp_left. intros _.
   apply allp_derives; intros id.
   apply allp_derives; intros fs.
   apply imp_derives; trivial.
@@ -48,6 +50,7 @@ Lemma corable_allp_fun_id: forall Delta rho,
   corable (allp_fun_id Delta rho).
 Proof.
   intros.
+  apply corable_andp; [apply corable_prop |].
   apply corable_allp; intros id.
   apply corable_allp; intros fs.
   apply corable_imp; [apply corable_prop |].
@@ -89,6 +92,7 @@ Lemma allp_fun_id_sub: forall Delta Delta' rho,
   allp_fun_id Delta' rho |-- allp_fun_id Delta rho.
 Proof.
   intros.
+  apply andp_derives. apply derives_refl.
   apply allp_derives; intros id.
   intros w W fs u WU FS.
   destruct H as [_ [_ [_ [_ [? _]]]]].
@@ -103,6 +107,7 @@ Qed.
 
 Lemma funassert_allp_fun_id Delta rho: funassert Delta rho |-- allp_fun_id Delta rho.
 Proof. apply andp_left1.
+  apply andp_derives. apply derives_refl.
   apply allp_derives; intros id.
   apply allp_derives; intros fs.
   apply imp_derives; trivial.

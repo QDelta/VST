@@ -775,6 +775,17 @@ rewrite H3.
 auto.
 Qed.
 
+Lemma filter_genv_injection:
+  forall genv,
+    gvar_injection (filter_genv genv).
+Proof.
+  intros.
+  unfold gvar_injection.
+  intros id1 id2 b.
+  unfold Map.get, filter_genv, Genv.find_symbol.
+  intros. eapply Genv.genv_vars_inj; eassumption.
+Qed.
+
 Lemma funassert_initial_core:
 forall (prog: program) ve te V G n,
   list_norepet (prog_defs_names prog) ->
@@ -782,7 +793,8 @@ forall (prog: program) ve te V G n,
   app_pred (funassert (nofunc_tycontext V G) (mkEnviron (filter_genv (globalenv prog)) ve te))
                   (initial_core (Genv.globalenv prog) G n).
 Proof.
-intros; split.
+intros; split; [split |].
+* apply filter_genv_injection.
 * intros id fs.
 apply prop_imp_i; intros.
 simpl ge_of; simpl fst; simpl snd.
@@ -921,7 +933,9 @@ forall (ora : OK_ty) (prog: program) ve te V G n,
   app_pred (funassert (nofunc_tycontext V G) (mkEnviron (filter_genv (globalenv prog)) ve te))
                   (initial_core_ext ora (Genv.globalenv prog) G n).
 Proof.
-intros; split.
+intros; split; [split |].
+*
+apply filter_genv_injection.
 *
 intros id fs.
 apply prop_imp_i; intros.
@@ -1932,7 +1946,7 @@ spec H11; [clear H11|]. {
    with (jm := jm2); try eassumption.
  +
   erewrite <- age_jm_dry by apply H13;  eassumption.
- +destruct H23 as [H _]. 
+ +destruct H23 as [[_ H] _]. 
     intros. specialize (H b0 b1 a' H1 H3).
     destruct H as [b2 [? ?]]; exists b2; split; auto.
     rewrite <- H.
